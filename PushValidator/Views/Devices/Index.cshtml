@@ -1,0 +1,22 @@
+﻿@using PushValidator.Models.DeviceViewModels
+
+@model ListDevicesViewModel
+@{
+    ViewData["Title"] = "Devices List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-controller="Devices" asp-action="Add">
+        <button type="button" class="btn btn-default">Add Device</button>
+    </a>
+</p>
+
+@foreach(var device in Model.Devices)
+{
+    <p>@device.Id - @device.Name</p>
+}
+
+
+

@@ -15,9 +15,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="Views\Devices\" />
+    <Folder Include="Models\DeviceViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".DS_Store" />

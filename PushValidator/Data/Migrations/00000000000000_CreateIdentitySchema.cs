@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using PushValidator.Models;
 
 namespace PushValidator.Data.Migrations
 {
@@ -63,6 +61,7 @@ namespace PushValidator.Data.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
+        
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -150,6 +149,8 @@ namespace PushValidator.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            
+
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
@@ -190,6 +191,12 @@ namespace PushValidator.Data.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            //migrationBuilder.CreateIndex(
+            //    name: "UserNameIndex",
+            //    table: "AspNetUsers",
+            //    column: "NormalizedUserName",
+            //    unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -214,6 +221,7 @@ namespace PushValidator.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
         }
     }
 }
