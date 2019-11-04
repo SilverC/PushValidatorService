@@ -1,0 +1,67 @@
+﻿@model PushValidator.Models.DeviceViewModels.ViewDeviceViewModel
+
+@{
+    ViewData["Title"] = "Device Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SymmetricKey)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SymmetricKey)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Registered)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Registered)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PublicKey)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PublicKey)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeviceToken)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeviceToken)
+        </dd>
+    </dl>
+</div>
+<p>Scan the QR Code or enter this key <kbd>@Model.SymmetricKey</kbd> into the Push Validator app.</p>
+<div id="qrCode"></div>
+<div id="qrCodeData" data-url="@Model.RegisterURI"></div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/lib/qrcode//qrcode.js"></script>
+    <script type="text/javascript">
+        new QRCode(document.getElementById("qrCode"),
+            {
+                text: "@Html.Raw(Model.RegisterURI)",
+                width: 150,
+                height: 150
+            });
+    </script>
+}

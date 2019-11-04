@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PushValidator.Models.DeviceViewModels
 {
@@ -15,7 +14,10 @@ namespace PushValidator.Models.DeviceViewModels
         public string Name { get; set; }
 
         [Display(Name = "Symmetric Key")]
-        //TODO: make required once client side generation in place
+        [Required]
         public string SymmetricKey { get; set; }
+
+        public string RegisterURI { get; set; }
+
     }
 }

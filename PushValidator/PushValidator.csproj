@@ -14,6 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
   </ItemGroup>
   <ItemGroup>
      <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
@@ -23,6 +24,7 @@
     <Folder Include="Services\" />
     <Folder Include="Views\Devices\" />
     <Folder Include="Models\DeviceViewModels\" />
+    <Folder Include="Models\ApplicationViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".DS_Store" />

@@ -219,7 +219,26 @@ namespace PushValidator.Data.Migrations
                 b.ToTable("AuthenticationResults");
             });
 
+            modelBuilder.Entity<ApplicationModel>(b =>
+            {
+                b.Property(a => a.Key);
+                b.Property(a => a.Name);
+                b.Property(a => a.UserId);
+
+                b.HasKey(a => a.Id);
+
+                b.ToTable("AuthenticationResults");
+            });
+
             modelBuilder.Entity("PushValidator.Models.DeviceModel", b =>
+            {
+                b.HasOne("PushValidator.Models.ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity("PushValidator.Models.ApplicationModel", b =>
             {
                 b.HasOne("PushValidator.Models.ApplicationUser")
                         .WithMany()
@@ -232,6 +251,11 @@ namespace PushValidator.Data.Migrations
                 b.HasOne("PushValidator.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne("PushValidator.Models.ApplicationModel")
+                        .WithMany()
+                        .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade);
             });
 

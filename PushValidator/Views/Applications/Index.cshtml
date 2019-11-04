@@ -1,44 +1,33 @@
-﻿@using PushValidator.Models.DeviceViewModels
+@model IEnumerable<PushValidator.Models.ApplicationModel>
 
-@model ListDevicesViewModel
 @{
-    ViewData["Title"] = "Devices List";
+    ViewData["Title"] = "Applications ";
 }
 
-<h2>@ViewData["Title"]</h2>
 
 <p>
-    <a asp-controller="Devices" asp-action="Add">
-        <button type="button" class="btn btn-default">Add Device</button>
-    </a>
+    <a asp-action="Create">Create New</a>
 </p>
-
 <table class="table">
     <thead>
         <tr>
             <th>
-                Name
+                @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                ID
-            </th>
-            <th>
-                Registered
+                @Html.DisplayNameFor(model => model.Key)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Devices) {
+@foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Registered)
+                @Html.DisplayFor(modelItem => item.Key)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -49,6 +38,3 @@
 }
     </tbody>
 </table>
-
-
-

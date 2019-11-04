@@ -8,12 +8,35 @@ namespace PushValidator.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Applications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Key = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Applications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Applications_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
+
+            migrationBuilder.CreateTable(
                 name: "Transactions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
                     UserId = table.Column<Guid>(nullable: false),
                     ApplicationId = table.Column<Guid>(nullable: false),
+                    Signature = table.Column<string>(nullable: false),
                     ClientIP = table.Column<string>(nullable: true),
                     GeoLocation = table.Column<string>(nullable: true),
                     UserName = table.Column<string>(nullable: false)
@@ -25,6 +48,13 @@ namespace PushValidator.Data.Migrations
                         name: "FK_Transactions_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade
+                    );
+                    table.ForeignKey(
+                        name: "FK_Transactions_ApplicationId",
+                        column: x => x.ApplicationId,
+                        principalTable: "Applications",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade
                     );
@@ -81,6 +111,8 @@ namespace PushValidator.Data.Migrations
                     );
                 }
             );
+
+            
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -93,6 +125,9 @@ namespace PushValidator.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Transactions");
+
+            migrationBuilder.DropTable(
+                name: "Applications");
         }
     }
 }

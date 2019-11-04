@@ -123,6 +123,22 @@ namespace PushValidator.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("PushValidator.Models.ApplicationModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Key");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Applications");
+                });
+
             modelBuilder.Entity("PushValidator.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -206,11 +222,11 @@ namespace PushValidator.Data.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("PublicKey");
+
                     b.Property<bool>("Registered");
 
                     b.Property<string>("SymmetricKey");
-
-                    b.Property<string>("PublicKey");
 
                     b.Property<string>("UserId");
 
@@ -229,6 +245,8 @@ namespace PushValidator.Data.Migrations
                     b.Property<string>("ClientIP");
 
                     b.Property<string>("GeoLocation");
+
+                    b.Property<string>("Signature");
 
                     b.Property<string>("UserId");
 

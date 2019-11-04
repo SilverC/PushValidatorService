@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PushValidator.Models.DeviceViewModels
 {
@@ -18,7 +21,11 @@ namespace PushValidator.Models.DeviceViewModels
         public string PublicKey { get; set; }
 
         [Required]
-        //TODO: Add custom validation with other data points as inputs
         public string HMAC { get; set; }
+
+        public byte[] GetCombinedByteString()
+        {
+            return Encoding.UTF8.GetBytes(DeviceId + DeviceToken + PublicKey);
+        }
     }
 }

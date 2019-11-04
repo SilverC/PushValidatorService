@@ -9,6 +9,10 @@
 
 <div class="row">
     <div class="col-md-4">
+        <p>Scan the QR Code or enter this key <kbd>@Model.SymmetricKey</kbd> into the Push Validator app.</p>
+        <div id="qrCode"></div>
+        <div id="qrCodeData" data-url="@Model.RegisterURI"></div>
+
         <form method="post">
             <h4>Add a new device.</h4>
             <hr />
@@ -21,7 +25,25 @@
             <div class="form-group">
                 <input asp-for="Id" hidden="hidden" readonly />
             </div>
+            <div class="form-group">
+                <input asp-for="SymmetricKey" hidden="hidden" readonly />
+            </div>
             <button type="submit" class="btn btn-default">Add</button>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+    <script type="text/javascript" src="~/lib/qrcode//qrcode.js"></script>
+    <script type="text/javascript">
+        new QRCode(document.getElementById("qrCode"),
+            {
+                text: "@Html.Raw(Model.RegisterURI)",
+                width: 150,
+                height: 150
+            });
+    </script>
+}
