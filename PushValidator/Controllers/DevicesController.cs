@@ -19,7 +19,7 @@ namespace PushValidator.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
-        private const string RegisterUriFormat = "https://pushvalidator.com/register?secret={0}";
+        private const string RegisterUriFormat = "https://pushvalidator.com/register?secret={0}&id={1}";
 
         public DevicesController(ApplicationDbContext dbContext,
                                  UserManager<ApplicationUser> userManager)
@@ -62,7 +62,7 @@ namespace PushValidator.Controllers
 
             var model = new ViewDeviceViewModel
             {
-                RegisterURI = string.Format(RegisterUriFormat, device.SymmetricKey),
+                RegisterURI = string.Format(RegisterUriFormat, device.SymmetricKey, device.Id),
                 Id = device.Id,
                 PublicKey = device.PublicKey,
                 SymmetricKey = device.SymmetricKey,
@@ -82,12 +82,14 @@ namespace PushValidator.Controllers
             byte[] bytes = new byte[32];
             _rng.GetBytes(bytes);
             var key = Convert.ToBase64String(bytes);
+            var id = Guid.NewGuid().ToString();
+            var registerURI = string.Format(RegisterUriFormat, key, id);
 
             var model = new AddDeviceViewModel
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = id,
                 SymmetricKey = key,
-                RegisterURI = string.Format(RegisterUriFormat, key)
+                RegisterURI = registerURI
             };
             return View(model);
         }
@@ -129,7 +131,7 @@ namespace PushValidator.Controllers
 
         [HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> Update(UpdateDeviceViewModel model)
+        public async Task<IActionResult> Update([FromBody] UpdateDeviceViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -155,7 +157,7 @@ namespace PushValidator.Controllers
                 var hmac = new HMACSHA256(key);
                 var computedHash = hmac.ComputeHash(model.GetCombinedByteString());
                 var providedHash = Convert.FromBase64String(model.HMAC);
-                if (computedHash != providedHash)
+                if (!computedHash.SequenceEqual(providedHash))
                 {
                     return BadRequest();
                 }
@@ -181,6 +183,30 @@ namespace PushValidator.Controllers
 
             // Model validation did not pass
             return BadRequest();
+        }
+
+        //TODO: Remove this method. For testing only.
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult GetHMAC(UpdateDeviceViewModel model)
+        {
+            var device = _dbContext.Devices.Find(new Guid(model.DeviceId));
+            if (device == null)
+            {
+                // If device can't be located in the database return 404
+                return NotFound();
+            }
+
+            var data = model.GetCombinedByteString();
+            var key = Convert.FromBase64String(device.SymmetricKey);
+            var hmac = new HMACSHA256(key);
+
+            var result = new GetHMACModel
+            {
+                HMAC = Convert.ToBase64String(hmac.ComputeHash(data))
+            };
+
+            return View(result);
         }
 
     }

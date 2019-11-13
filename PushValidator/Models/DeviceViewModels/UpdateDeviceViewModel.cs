@@ -27,5 +27,15 @@ namespace PushValidator.Models.DeviceViewModels
         {
             return Encoding.UTF8.GetBytes(DeviceId + DeviceToken + PublicKey);
         }
+
+        public byte[] CalculateSignature(string keyString)
+        {
+            var key = Convert.FromBase64String(keyString);
+            var data = GetCombinedByteString();
+            using (var hmac = new HMACSHA256(key))
+            {
+                return hmac.ComputeHash(data);
+            }
+        }
     }
 }
