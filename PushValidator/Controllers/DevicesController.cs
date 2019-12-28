@@ -185,6 +185,21 @@ namespace PushValidator.Controllers
             return BadRequest();
         }
 
+        // POST: Devices/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            var device = await _dbContext.Devices
+                .FirstOrDefaultAsync(m =>
+                        m.Id == id &&
+                        m.UserId == _userManager.GetUserId(User)
+                );
+            _dbContext.Devices.Remove(device);
+            await _dbContext.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
         //TODO: Remove this method. For testing only.
         [HttpGet]
         [AllowAnonymous]
