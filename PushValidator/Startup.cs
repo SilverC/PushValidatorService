@@ -19,22 +19,36 @@ namespace PushValidator
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public IConfiguration Configuration { get; }
+        private readonly IHostingEnvironment _env;
         readonly string MyAllowSpecificOrigins = "_pushValidatorAllowedOrigins";
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")
-                )
-            );
+            if(_env.IsProduction())
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(
+                        Configuration.GetConnectionString("DefaultConnection")
+                    )
+                );
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite(
+                        Configuration.GetConnectionString("DefaultConnection")
+                    )
+                );
+            }
+            
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
