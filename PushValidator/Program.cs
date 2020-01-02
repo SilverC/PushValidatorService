@@ -15,7 +15,7 @@ namespace PushValidator
             WebHost.CreateDefaultBuilder(args)
                    .ConfigureAppConfiguration(configuration =>
                    {
-                       configuration.AddJsonFile("secrets.json");
+                       configuration.AddJsonFile("secrets.json", optional: true);
                    })
                    .UseStartup<Startup>();
     }
