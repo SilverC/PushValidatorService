@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+
 namespace PushValidator.Models
 {
     public class AuthenticationResultModel

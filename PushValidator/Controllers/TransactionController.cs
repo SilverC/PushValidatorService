@@ -4,14 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
+using PushSharp.Apple;
 using PushValidator.Data;
 using PushValidator.Models;
 using PushValidator.Models.APIModels;
+using PushValidator.Library;
+using Microsoft.Extensions.Options;
 
 namespace PushValidator.Controllers
 {
@@ -19,12 +24,15 @@ namespace PushValidator.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IOptions<APNSConfiguration> _apnsConfiguration;
 
         public TransactionController(ApplicationDbContext dbContext,
-                                 UserManager<ApplicationUser> userManager)
+                                     UserManager<ApplicationUser> userManager,
+                                     IOptions<APNSConfiguration> apnsConfiguration)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _apnsConfiguration = apnsConfiguration;
         }
 
         // GET: /<controller>/
@@ -78,9 +86,80 @@ namespace PushValidator.Controllers
             var user = await _userManager.FindByNameAsync(model.UserName);
             var device = _dbContext.Devices.FirstOrDefault(x => x.UserId == user.Id);
 
-            // TODO: Send push notification to device.
+            //TODO: Implement geolocation of IP
+            var notification = new LoginNotificationModel
+            {
+                TransactionId = transaction.Id,
+                ApplicationName = application.Name,
+                UserName = transaction.UserName,
+                ClientIP = transaction.ClientIP,
+                GeoLocation = "Not yet implemented",
+                TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds()
+            };
+
+            SendNotification(device.DeviceToken, notification);
 
             return Ok(transactionId);
+        }
+
+        private bool SendNotification(string deviceToken, LoginNotificationModel model)
+        {
+            // Configuration(NOTE: .pfx can also be used here)
+            var config = new ApnsConfiguration(ApnsConfiguration.ApnsServerEnvironment.Sandbox,
+                                               _apnsConfiguration.Value.CertificatePath,
+                                               _apnsConfiguration.Value.CertificatePassword);
+
+            // Create a new broker
+            var apnsBroker = new ApnsServiceBroker(config);
+
+            // Wire up events
+            apnsBroker.OnNotificationFailed += (notification, aggregateEx) => {
+
+                aggregateEx.Handle(ex => {
+
+                    // See what kind of exception it was to further diagnose
+                    if (ex is ApnsNotificationException notificationException)
+                    {
+
+                        // Deal with the failed notification
+                        var apnsNotification = notificationException.Notification;
+                        var statusCode = notificationException.ErrorStatusCode;
+
+                        Console.WriteLine($"Apple Notification Failed: ID={apnsNotification.Identifier}, Code={statusCode}");
+
+                    }
+                    else
+                    {
+                        // Inner exception might hold more useful information like an ApnsConnectionException			
+                        Console.WriteLine($"Apple Notification Failed for some unknown reason : {ex.InnerException}");
+                    }
+
+                    // Mark it as handled
+                    return true;
+                });
+            };
+
+            apnsBroker.OnNotificationSucceeded += (notification) => {
+                Console.WriteLine("Apple Notification Sent!");
+            };
+
+            // Start the broker
+            apnsBroker.Start();
+            var json = model.ToAPNSNotification();
+            var test = JObject.Parse("{\"aps\":{ \"alert\":\"Authentication Request\" },\"ApplicationName\":\"Sample .Net App\",\"UserName\": \"admin@test.com\",\"ClientIp\": \"192.168.1.10\",\"GeoLocation\": \"Harrisonburg, VA, USA\",\"TransactionId\": \"ea690fa5-8454-4909-902f-3f1b69db9119\",\"Timestamp\": 1577515106.505353}");
+
+            apnsBroker.QueueNotification(new ApnsNotification
+            {
+                DeviceToken = deviceToken,
+                Payload = json
+                //Payload = JObject.Parse("{\"aps\":{ \"alert\":\"Authentication Request\" },\"ApplicationName\":\"Sample .Net App\",\"UserName\": \"admin@test.com\",\"ClientIp\": \"192.168.1.10\",\"GeoLocation\": \"Harrisonburg, VA, USA\",\"TransactionId\": \"ea690fa5-8454-4909-902f-3f1b69db9119\",\"Timestamp\": 1577515106.505353}")
+            });
+
+            // Stop the broker, wait for it to finish   
+            // This isn't done after every message, but after you're
+            // done with the broker
+            apnsBroker.Stop();
+            return false;
         }
 
         [HttpPost]
@@ -138,7 +217,6 @@ namespace PushValidator.Controllers
             }
 
 
-            // TODO: Figure out how to use device public key to verify signed data
             var verification = model.VerifySignature(device.PublicKey);
             if(!verification)
             {
@@ -247,7 +325,7 @@ namespace PushValidator.Controllers
         // TODO: Add HMAC protection for query
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult CheckAuthentication(Guid transactionId)
+        public async Task<IActionResult> CheckAuthentication(Guid transactionId)
         {
             var result = _dbContext.AuthenticationResults
                 .FirstOrDefault(x => x.TransactionId == transactionId);
@@ -256,7 +334,32 @@ namespace PushValidator.Controllers
                 return NotFound();
             }
 
-            return Json(result);
+            var transaction = await _dbContext.Transactions.FindAsync(result.TransactionId);
+            if(transaction == null)
+            {
+                return NotFound();
+            }
+
+            var application = await _dbContext.Applications.FindAsync(transaction.ApplicationId);
+            if (application == null)
+            {
+                return NotFound();
+            }
+
+            var model = new GetAuthenticationResultModel
+            {
+                ActualClientIP = result.ActualClientIP,
+                CertificateFingerprint = result.CertificateFingerprint,
+                ClientIPMatch = result.ClientIPMatch,
+                Result = result.Result,
+                ServerIP = result.ServerIP,
+                ServerURI = result.ServerURI,
+                TransactionId = result.TransactionId
+            };
+
+            model.Signature = Convert.ToBase64String(model.CalculateSignature(application.Key));
+
+            return Json(model);
         }
     }
 }

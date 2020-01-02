@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.1.1</PackageVersion>
+    <Authors>Casey Silver</Authors>
+    <PackageId>PushValidator.Library</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.Build" Version="2.12.1" />
+  </ItemGroup>
+</Project>

@@ -26,6 +26,7 @@ namespace PushValidator
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public IConfiguration Configuration { get; }
+        readonly string MyAllowSpecificOrigins = "_pushValidatorAllowedOrigins";
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -75,6 +76,17 @@ namespace PushValidator
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                            .WithMethods("POST", "GET")
+                            .WithHeaders("content-type");
+                });
+            });
+            services.Configure<APNSConfiguration>(options => Configuration.GetSection("APNS").Bind(options));
             services.AddMvc();
 
         }
@@ -96,8 +108,7 @@ namespace PushValidator
             app.UseStaticFiles();
 
             app.UseAuthentication();
-
-
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

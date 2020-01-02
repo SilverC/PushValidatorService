@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PushValidator.Models.APIModels
+namespace PushValidator.Library
 {
     public class AddTransactionModel
     {

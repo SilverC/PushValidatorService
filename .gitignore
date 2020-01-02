@@ -407,3 +407,10 @@ ASALocalRun/
 # databases
 *.db
 *.db*
+
+# VS Code
+.vscode/
+
+# Custom Files
+**/secrets.json
+

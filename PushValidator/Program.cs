@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace PushValidator
 {
@@ -12,6 +13,10 @@ namespace PushValidator
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                   .ConfigureAppConfiguration(configuration =>
+                   {
+                       configuration.AddJsonFile("secrets.json");
+                   })
+                   .UseStartup<Startup>();
     }
 }

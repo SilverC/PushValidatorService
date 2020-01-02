@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PushValidator.Data;
+using PushValidator.Library;
 using PushValidator.Models;
 
 namespace PushValidator.Data.Migrations

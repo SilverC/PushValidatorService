@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageVersion>0.2.1</PackageVersion>
+    <Authors>Casey Silver</Authors>
+    <Description>.NET Core library for interacting with the PushValidator service</Description>
+    <PackageId>PushValidator.SDK</PackageId>
+    <Title>PushValidatorSDK</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NuGet.Build" Version="2.12.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PushValidatorLibrary\PushValidator.Library.csproj" />
+  </ItemGroup>
+</Project>
