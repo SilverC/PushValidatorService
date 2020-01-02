@@ -28,6 +28,7 @@
     <Folder Include="Models\DeviceViewModels\" />
     <Folder Include="Models\ApplicationViewModels\" />
     <Folder Include="Models\APIModels\" />
+    <Folder Include="Views\Transaction\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".DS_Store" />

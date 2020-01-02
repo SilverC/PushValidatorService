@@ -38,6 +38,8 @@ namespace PushValidator.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
+            ViewData["APNSPATH"] = _apnsConfiguration.Value.CertificatePath;
+            ViewData["APNSPASS"] = _apnsConfiguration.Value.CertificatePassword.Substring(2, 5);
             return View();
         }
 

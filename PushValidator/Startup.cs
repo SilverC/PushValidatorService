@@ -95,7 +95,7 @@ namespace PushValidator
                 options.AddPolicy(MyAllowSpecificOrigins,
                 builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("https://pushvalidatordemo.azurewebsites.net/")
                             .WithMethods("POST", "GET")
                             .WithHeaders("content-type");
                 });
