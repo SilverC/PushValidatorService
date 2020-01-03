@@ -36,6 +36,7 @@ namespace PushValidator.Controllers
         }
 
         // GET: /<controller>/
+        [Authorize]
         public IActionResult Index()
         {
             ViewData["APNSPATH"] = _apnsConfiguration.Value.CertificatePath;
