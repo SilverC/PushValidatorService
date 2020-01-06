@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
@@ -38,13 +39,28 @@ namespace PushValidator.SDK
         /// </summary>
         /// <param name="secretKey">Secret key used to calculate the HMAC</param>
         /// <param name="result">The authentication result to be verified</param>
+        /// <param name="serverIPs">Application expected host IPs</param>
+        /// <param name="serverCertificateFingerprints">Application expected certificate fingerprints</param>
+        /// <param name="serverURIs">Application expected URIs</param>
         /// <returns></returns>
         public static bool ValidateResponse(string secretKey,
-                                            GetAuthenticationResultModel result)
+                                            GetAuthenticationResultModel result,
+                                            IEnumerable<string> serverIPs,
+                                            IEnumerable<string> serverCertificateFingerprints,
+                                            IEnumerable<string> serverURIs)
         {
             var calculatedSignature = result.CalculateSignature(secretKey);
             var signatureBytes = Convert.FromBase64String(result.Signature);
-            return signatureBytes.SequenceEqual(calculatedSignature);
+            var verifySignature = signatureBytes.SequenceEqual(calculatedSignature);
+            var serverIPMatch = serverIPs.Contains(result.ServerIP);
+            var serverFingerprintMatch = serverCertificateFingerprints.Contains(result.CertificateFingerprint);
+            var serverDomain = new Uri(result.ServerURI);
+            var serverURIMatch = serverURIs.Contains(serverDomain.Host);
+
+            return verifySignature
+                   && serverIPMatch
+                   && serverURIMatch
+                   && serverFingerprintMatch;
         }
 
         /// <summary>

@@ -87,7 +87,15 @@ namespace PushValidator.Controllers
 
             // Retrieve user by username in order to get user's device
             var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+            {
+                return BadRequest("No matching user found.");
+            }
             var device = _dbContext.Devices.FirstOrDefault(x => x.UserId == user.Id);
+            if (device == null)
+            {
+                return BadRequest("No device found for user.");
+            }
 
             //TODO: Implement geolocation of IP
             var notification = new LoginNotificationModel
