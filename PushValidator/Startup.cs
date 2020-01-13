@@ -90,16 +90,16 @@ namespace PushValidator
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy(MyAllowSpecificOrigins,
-                builder =>
-                {
-                    builder.WithOrigins("https://pushvalidatordemo.azurewebsites.net")
-                            .WithMethods("POST", "GET")
-                            .WithHeaders("content-type");
-                });
-            });
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy(MyAllowSpecificOrigins,
+            //    builder =>
+            //    {
+            //        builder.WithOrigins("https://pushvalidatordemo.azurewebsites.net")
+            //                .WithMethods("POST", "GET")
+            //                .WithHeaders("content-type");
+            //    });
+            //});
             services.Configure<APNSConfiguration>(options => Configuration.GetSection("APNS").Bind(options));
             services.AddMvc();
 
@@ -122,7 +122,7 @@ namespace PushValidator
             app.UseStaticFiles();
 
             app.UseAuthentication();
-            app.UseCors(MyAllowSpecificOrigins);
+            //app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
